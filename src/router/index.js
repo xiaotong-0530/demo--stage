@@ -16,11 +16,16 @@ const routes = [
     name: "Home",
     component: () =>import( "../views/Home/index.vue")
   },
+  // {
+  //   path: "/vue2.0",
+  //   name: "Login1",
+  //   component: () =>import( "../views/Login/vue2.0.vue")
+  // },
   {
     path: "/login",
-    name: "Login",
-    component: () =>import( "../views/Login/index.vue")
-  },
+    name: "Login2",
+    component: () =>import( "../views/Login/vue3.0.vue")
+  }
 ];
 
 const router = new VueRouter({
