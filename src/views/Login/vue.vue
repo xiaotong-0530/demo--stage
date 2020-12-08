@@ -28,12 +28,12 @@
                     <el-input id="code" v-model="ruleForm.code"></el-input>
                 </el-col>
                 <el-col :span="9">
-                    <el-button type="success" class="black">获取验证码</el-button>
+                    <el-button type="success" :disabled="codeButtonStatus" class="black" @click="getCode">{{codeButtonText}}</el-button>
                 </el-col>
               </el-row>
           </el-form-item>
           <el-form-item >
-            <el-button type="danger" @click="submitForm('ruleForm')" class="black">{{this.mode=="login" ? "登录":"注册"}}</el-button>
+            <el-button type="danger" @click="submitForm('ruleForm')" class="black" :disabled="buttonStatus">{{this.mode=="login" ? "登录":"注册"}}</el-button>
           </el-form-item>
         </el-form>
 
@@ -44,36 +44,47 @@
 <script>
 import dataobject from "@/utils/vaildatas.js"
 import {onMounted, reactive,ref} from "@vue/composition-api";
-import {get_code} from "@/api/login.js"
+import {get_code,do_register,do_login} from "@/api/login.js"
 export default {
   name: "login",
-  setup(prop, {refs}) {
- 
+  setup(prop, {refs,root}) {
+    //-------------------------------------生命周期----------------------------------------------
+     
+
     //----------------------------------------------------data------------------------------------------------------------
-    
+      const status_username=ref(false)
+      const status_password=ref(false)
+      const status_password1=ref(false)
+
+
+
     //Rule验证的字段  value 输入的值   callback验证后要做什么(回调函数)
       //邮箱
       let validateUsername = (rule, value, callback) => {
         //过滤
         ruleForm.username = value = dataobject.validatas_inputValue(value,"email")
           if (value === '') {
+            status_username.value=false
             callback(new Error('请输入邮箱'));
           } else if(dataobject.test_email(value)) {
             callback(new Error('邮箱格式错误'));
           }else{
+            status_username.value=true
             callback();
           }
       };
-      // 密码
+      //密码
       let validatePassword = (rule, value, callback) => {
         //过滤
           ruleForm.password = value = dataobject.validatas_inputValue(value,"password")
           
           if (value === '') {
+            status_password.value=false
             callback(new Error('请输入密码'));
           }else if(dataobject.test_password(value)) {
             callback(new Error('请输入数字+字母的格式'));
           }else{
+            status_password.value=true
             callback();
           }
       };
@@ -83,8 +94,10 @@ export default {
           ruleForm.password1 = value = dataobject.validatas_inputValue(value,"password1")
           
           if (value !== ruleForm.password) {
+            status_password1.value=false
             callback(new Error('两次密码输入不一致'));
           }else{
+            status_password1.value=true
             callback(); 
           }
       };
@@ -129,6 +142,18 @@ export default {
           { validator: validateCode, trigger: 'blur' }
         ]
       })
+      //定义按钮禁用和启用
+      const buttonStatus=ref(true)
+      //定义登录注册按钮的禁用和启用
+      const codeButtonStatus=ref(false)
+      //定义验证码按钮文本
+      const codeButtonText=ref("获取验证码")
+      //定义验证码延迟定时器
+      const timer_delay=ref(null)
+      //定义 验证码倒计时定时器
+      const timer_count_down=ref(null)
+
+
 
     //----------------------------------------------------方法---------------------------------------------------
       //登录注册切换
@@ -137,11 +162,21 @@ export default {
         mentTab.map(item => item.current =false)
         item.current=true;
         mode.value=item.type//点击的时候让重复密码出来
+        //点击切换对内容进行重置
+        
+        //还原验证码相关态度
+        resetCodeButton()
+        //还原登录注册按钮状态
+        buttonStatus.value=true
+        refs["ruleForm"].resetFields()
+
+
       }
       const submitForm=(formName)=>{
         refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit成功!');
+            //执行登录注册
+            mode.value === "login" ? doLogin() : doRegister()
           } else {
             console.log('error submit!!');
             return false;
@@ -150,7 +185,150 @@ export default {
       }
       const resetForm=(formName)=>{
         refs[formName].resetFields();
+      }
+      //获取验证码
+      const getCode=()=>{
+        //判断邮箱格式  密码  重置密码 的格式
         
+        const {result,filed}=validataFileds()
+        let offset=0
+        // 判断邮箱格式 密码 重复密码的格式
+        if(!result){//true 验证通过 false 验证未通过
+            filed.map(item=>{
+                offset+=40
+                root.$message({
+                    type:"error",
+                    message:`错误字段:${item.message}`,   //显示错误字段
+                    offset:offset,   //间距
+                    duration:2000  //延迟2秒
+                })
+            })
+            return false
+        }
+       
+
+        //让按钮禁用 显示 "发送中"
+        setCodeButton({
+          status:true,
+          text:"发送中"
+        })
+
+        //为了模拟网络延迟 定时器 一次性
+        timer_delay.value = setTimeout(()=>{
+            const data={
+              username:ruleForm.username,
+              module:mode.value
+            }
+
+            get_code(data).then((res)=>{
+              // console.log(res)
+              //成功信息  获取到对用的验证码
+              root.$message.success(res.data.message)
+              //显示倒计时
+              countDown(10)
+              //让登录注册按钮启用
+              buttonStatus.value=false
+            }).catch((err)=>{
+              // console.log(2)
+            })
+        },1000)
+      }
+
+    // ------------------------------------------------辅助方法 函数------------------------------------------------
+
+      //验证定时器的倒时效果
+      const countDown=((timer)=>{
+          // if(timer_count_down.value){//存在定时器
+          //     clearInterval(timer_count_down.value)
+          // }
+
+          timer_count_down.value=setInterval(()=>{
+            timer--;
+            if(timer === 0){ 
+                clearInterval(timer_count_down.value)//清除定时器
+
+                //显示重新发送
+                setCodeButton({
+                  status:false,
+                  text:"重新发送"
+                })
+
+               
+            }else{
+              codeButtonText.value=`倒计时${timer}秒`
+            }
+            
+          },1000)
+      })
+
+      // 还原验证码的相关状态
+      const resetCodeButton=(()=>{
+          //默认启用发送中
+          setCodeButton({
+            status:false,
+            text:"获取验证码"
+          })
+          //清空两个定时器
+          clearTimeout(timer_delay.value)
+          clearInterval(timer_count_down.value)
+      })
+
+      //设置获取验证码的相关状态  封装
+      const setCodeButton=({status,text})=>{
+          codeButtonStatus.value=status
+          codeButtonText.value=text
+      }
+
+      //执行登录
+      const doLogin=() =>{
+        const data = {
+          username: ruleForm.username,
+          password: ruleForm.password,
+          code: ruleForm.code,
+        }
+        //   执行登录
+        do_login(data)
+          .then((res) => {
+            // 提示登录成功
+            root.$message.success(res.data.message)
+            toggleMent(mentTab[0])
+          })
+          .catch((err) => {
+            
+          })
+      }
+
+      //执行注册
+      const doRegister = () => {
+        const data = {
+          username: ruleForm.username,
+          password: ruleForm.password,
+          code: ruleForm.code,
+        }
+        //   执行注册
+        do_register(data)
+          .then((res) => {
+            // 提示注册成功
+            root.$message.success(res.data.message)
+            toggleMent(mentTab[0])
+          })
+          .catch((err) => {
+            
+          })
+      }
+      
+      // 获取验证码是验证相关字段
+      const validataFileds=()=>{
+          const _filed_arr=[
+              {filed:"username",flag:status_username.value,message:"邮箱格式错误"},
+              {filed:"password",flag:status_password.value,message:"密码格式错误"},
+              {filed:"password1",flag:status_password1.value,message:"重复密码错误"},
+          ].filter(item=>!item.flag)
+          console.log(_filed_arr)
+          return{
+              result:status_username.value&&status_password.value&&status_password1.value,
+              filed:_filed_arr
+          }
       }
 
     return{
@@ -160,7 +338,11 @@ export default {
         rules,
         toggleMent,
         submitForm,
-        resetForm
+        resetForm,
+        getCode,
+        buttonStatus,
+        codeButtonStatus,
+        codeButtonText
     }
   }
 }

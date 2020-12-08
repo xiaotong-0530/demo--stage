@@ -5,6 +5,9 @@ const path = require("path")
 
 //commonjs  规范  node.js的规范
 module.exports  = {
+    //基本路径
+    publicPath:process.env.NODE_ENV==="production" ? '' : '/',
+
 	css: {
 		// 是否使用css分离插件 ExtractTextPlugin
 		extract: true, 
@@ -34,6 +37,29 @@ module.exports  = {
             }
            
         }
+    },
+    //代理
+    devServer:{
+        port:8010,
+        open:true,
+        //代理
+        proxy:{
+            // http://localhost:8081/api/getSms/
+            // http://www.web-jshtml.cn/productapi/getSems/   没有token业务的接口
+            // http://www.web-jshtml.cn/productapi/token/getSems/   没有token业务的接口
+            '/api':{
+                target:"http://www.web-jshtml.cn/productapi/token/",//目标接口
+                changeOrigin:true,//生成一个Localhost:8080域名下一个node服务器,帮你做代理,
+                //重写url
+                pathRewrite:{
+                    '^/api':''
+                }
+            }
+        }
+        
     }
-
 }
+
+
+
+
