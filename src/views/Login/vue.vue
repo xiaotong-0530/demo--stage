@@ -28,7 +28,7 @@
                     <el-input id="code" v-model="ruleForm.code"></el-input>
                 </el-col>
                 <el-col :span="9">
-                    <el-button type="success" :disabled="codeButtonStatus" class="black" @click="getCode">{{codeButtonText}}</el-button>
+                    <el-button type="success" :disabled="codeButtonStatus" class="black " @click="getCode">{{codeButtonText}}</el-button>
                 </el-col>
               </el-row>
           </el-form-item>
@@ -189,7 +189,6 @@ export default {
       //获取验证码
       const getCode=()=>{
         //判断邮箱格式  密码  重置密码 的格式
-        
         const {result,filed}=validataFileds()
         let offset=0
         // 判断邮箱格式 密码 重复密码的格式
@@ -206,7 +205,6 @@ export default {
             return false
         }
        
-
         //让按钮禁用 显示 "发送中"
         setCodeButton({
           status:true,
@@ -251,9 +249,7 @@ export default {
                 setCodeButton({
                   status:false,
                   text:"重新发送"
-                })
-
-               
+                }) 
             }else{
               codeButtonText.value=`倒计时${timer}秒`
             }
@@ -274,9 +270,10 @@ export default {
       })
 
       //设置获取验证码的相关状态  封装
-      const setCodeButton=({status,text})=>{
-          codeButtonStatus.value=status
-          codeButtonText.value=text
+      const setCodeButton= ({status,text})=>{
+          codeButtonStatus.value=status;
+          codeButtonText.value = text;
+        // console.log( codeButtonText.value)
       }
 
       //执行登录
@@ -286,12 +283,28 @@ export default {
           password: ruleForm.password,
           code: ruleForm.code,
         }
-        //   执行登录
+        root.$store.dispatch("app/login",data).then(res=>{
+             console.log("-->",res)
+        }).catch(err=>{
+
+        })
+
+
+
+
+
+          // 执行登录 网络请求 vuex--actions--mutations--state
         do_login(data)
           .then((res) => {
             // 提示登录成功
-            root.$message.success(res.data.message)
+            // root.$message.success(res.data.message)
             toggleMent(mentTab[0])
+            // 提示登录成功
+            root.$message.success(res.data.message)
+              // 登陆后跳转到首页
+              root.$router.push({
+                  name:"Home"
+              })
           })
           .catch((err) => {
             
@@ -319,15 +332,20 @@ export default {
       
       // 获取验证码是验证相关字段
       const validataFileds=()=>{
+          let result=status_username.value&&status_password.value
           const _filed_arr=[
               {filed:"username",flag:status_username.value,message:"邮箱格式错误"},
               {filed:"password",flag:status_password.value,message:"密码格式错误"},
-              {filed:"password1",flag:status_password1.value,message:"重复密码错误"},
-          ].filter(item=>!item.flag)
-          console.log(_filed_arr)
+              
+          ]
+          if(mode.value==="register"){
+              _filed_arr.push({filed:"password1",flag:status_password1.value,message:"重复密码错误"})
+              result=status_username.value&&status_password.value&&status_password1.value
+          }
+          
           return{
-              result:status_username.value&&status_password.value&&status_password1.value,
-              filed:_filed_arr
+              result:result,
+              filed:_filed_arr.filter(item=>!item.flag)
           }
       }
 

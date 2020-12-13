@@ -30,3 +30,5 @@ export const do_register =(data) =>{
         
     })
 }
+
+

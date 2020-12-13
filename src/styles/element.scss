@@ -1,0 +1,51 @@
+.el-submenu__title span{
+    font-size: 16px !important;
+}
+//选中的二级菜单样式
+.el-submenu .el-menu-item{
+    padding-left:50px !important;
+    font-size: 14px !important;
+        &.is-active{
+        background-color: $Menu_two !important;
+    }
+}
+//选中的一级菜单样式
+li.el-submenu{
+    &.is-active.is-opened{
+        .el-submenu__title{
+              background-color: $Menu_one !important;
+        }
+      
+    }
+}
+
+//搜索状态下修改一级菜单选中背景色
+.close{
+   .el-submenu {
+        &.is-opened{//关闭状态下所有菜单中被选中的菜单
+            .el-submenu__title{
+                background-color: $Menu_one !important;
+            }
+        }
+   }
+}
+
+
+//搜索状态下修改二级菜单选中背景色
+.el-menu--vertical{ 
+    margin:-5px 0 0 -5px;
+    //选中二级背景色
+    .el-menu-item:hover{
+        background-color:  #be6d6d !important;
+    }
+    .el-menu-item{
+        line-height: 55px;
+    }
+    .el-menu{
+       
+        background-color: rgb(201, 209, 203) !important;
+    }
+}
+
+
+

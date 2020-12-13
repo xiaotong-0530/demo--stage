@@ -1,12 +1,12 @@
 <template>
-  <div class="home">
-    <P>我是home</P>
+  <div class="cate">
+    <P>我是info  cate</P>
   </div>
 </template>
 
 <script>
 export default {
-  name: "Home",
+  name: "infoCate",
   setup(prop,{refs}){
 
     return{

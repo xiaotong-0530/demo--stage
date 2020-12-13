@@ -1,5 +1,6 @@
 import axios from "axios";
 import {Message} from "element-ui"
+// import {getToken} from "./cookie"
 const BSSEURL=process.env.NODE_ENV==='development' ? '/api' : ''
 
 const http =axios.create({
@@ -14,7 +15,10 @@ http.interceptors.request.use(function (config) {
     // console.log("请求拦截")
 
     //手动添加请求数据头参数 token userId csrf
-    config.headers.token="wwwww"
+    // if(getToken){
+    //   config.headers.token=getToken()
+    // }
+    
     console.log("请求参数",config.headers)
 
     return config;

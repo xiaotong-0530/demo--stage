@@ -2,6 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import "./Icons/index"
 
 //导入css入口文件
 import "./styles/main.scss"
@@ -16,6 +17,22 @@ Vue.prototype.$http= axios
 
 //系统默认的环境变量
 // console.log(process.env.NODE_ENV)   //development
+
+//声明一个全局组件
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
 
 
 // console.log(process.env)
