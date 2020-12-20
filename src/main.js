@@ -1,7 +1,10 @@
 import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
+//导入路由权限
+// import "./router/permit"
 import store from "./store";
+// icon图标
 import "./Icons/index"
 
 //导入css入口文件
@@ -17,13 +20,10 @@ Vue.prototype.$http= axios
 
 //系统默认的环境变量
 // console.log(process.env.NODE_ENV)   //development
-
-//声明一个全局组件
-
+//注入全局 2.0
+// import Global from './utils/global' // 引入
+// Vue.use(Global) // 添加
   
-  
-
-
 
 
 

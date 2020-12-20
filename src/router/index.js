@@ -92,9 +92,9 @@ const routes = [
   },
   {
     path: "/login",
-    name: "Login2",
+    name: "Login",
     hidden:true,
-    meta:{
+    meta:{               
       name:"用户管理"
     },
     component: () =>import( "../views/Login/vue.vue")
@@ -115,19 +115,19 @@ const router = new VueRouter({
 
 
 //路由守卫  登陆了才能跳转
-router.beforeEach((to,from,next)=>{
-  // console.log(to)//从哪里来
-  // console.log(from)//到哪里去
-  // console.log(next)
-  // const isLogin =localStorage.getItem('ele_login') ?true :false
-  // if(to.path==="/login"){
-  //    next()//接着往下走
-  // }else{
-  //   //是否登录  没有登录重定向登录页面  如果登录就正常next
-  //   isLogin ? next() : next("./login")
-  // }
-  next()
-})
+// router.beforeEach((to,from,next)=>{
+//   // console.log(to)//从哪里来
+//   // console.log(from)//到哪里去
+//   // console.log(next)
+//   // const isLogin =localStorage.getItem('ele_login') ?true :false
+//   // if(to.path==="/login"){
+//   //    next()//接着往下走
+//   // }else{
+//   //   //是否登录  没有登录重定向登录页面  如果登录就正常next
+//   //   isLogin ? next() : next("./login")
+//   // }
+//   next()
+// })
 
 
 

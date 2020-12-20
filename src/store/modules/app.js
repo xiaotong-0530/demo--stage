@@ -1,11 +1,11 @@
 import {do_login} from "../../api/login"
-import {setToken,setUsername,getUsername,getToken} from "../../utils/cookie"
+import {setToken,setUsername,getUsername,getToken,removeUsername,removeToken} from "../../utils/cookie"
 
 const state={
    // getItem  查找
    //  isCollapse:sessionStorage不存在走false 存在了就执行
    isCollapse:JSON.parse(sessionStorage.getItem("isCollapse")) || false,//展开
-   token:getToken() || "",
+   token:getToken() ||'',
    username:getUsername() || ""
 }
 const getters={ //推荐在getters里面写
@@ -28,6 +28,7 @@ const mutations={
    SET_TOKEN(state,value){
       state.token=value 
    }
+   
 }
 const actions={
    //登录action--> 
@@ -47,6 +48,17 @@ const actions={
          }).catch(err=>{
 
          })
+      })
+   },
+   //退出
+   exit({commit}){
+      return new Promise((resolve,reject)=>{ 
+         removeUsername()
+         removeToken()
+         commit("SET_USERNAME","")
+         commit("SET_TOKEN","")
+        
+         resolve()
       })
    }
 }

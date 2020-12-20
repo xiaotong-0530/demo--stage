@@ -25,7 +25,9 @@ export default {
     bottom: 0px;
     right:0px;
     background:white;
-    border:30px solid #cccccc;
+    padding-right: 10px;
+    padding-left:10px;
+    border:20px solid #cccccc;
     border-bottom: none;
     @include webkit("transition",all 2s ease 0s);
 }

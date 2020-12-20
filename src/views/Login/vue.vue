@@ -284,31 +284,15 @@ export default {
           code: ruleForm.code,
         }
         root.$store.dispatch("app/login",data).then(res=>{
-             console.log("-->",res)
-        }).catch(err=>{
-
-        })
-
-
-
-
-
-          // 执行登录 网络请求 vuex--actions--mutations--state
-        do_login(data)
-          .then((res) => {
-            // 提示登录成功
-            // root.$message.success(res.data.message)
-            toggleMent(mentTab[0])
-            // 提示登录成功
-            root.$message.success(res.data.message)
+             root.$message.success(res.data.message)
               // 登陆后跳转到首页
               root.$router.push({
                   name:"Home"
               })
-          })
-          .catch((err) => {
-            
-          })
+        }).catch(err=>{
+
+        })
+
       }
 
       //执行注册

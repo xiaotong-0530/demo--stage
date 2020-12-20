@@ -47,5 +47,40 @@ li.el-submenu{
     }
 }
 
+//移除侧边nav 的竖线
+.el-menu{
+    border-right: none !important;
+}
 
+//修改label颜色
+label,.el-input__inner{
+    color:#37495d;
+}
 
+//修改表格样式
+div.el-table{
+    th,td{
+        text-align: center;
+        color:#37495d;
+    }
+    th{
+        font-weight: bold;
+        color:#37495d;
+    }
+    td{
+        font-size: 14px;
+    }
+}
+
+//控制新增弹框宽度
+.el-dialog {
+    width:580px;
+}
+//控制新增按钮居中
+.dialog-footer{
+    text-align: center;
+}
+
+.el-dialog__body{
+    padding:30px 30px 20px 20px;    
+}

@@ -20,7 +20,7 @@ export const setToken=(value)=>{
 }
 //获取token
 export const getToken=()=>{
-    return cookie.set(token)
+    return cookie.get(token)
 }
 //清空token
 export const removeToken=()=>{

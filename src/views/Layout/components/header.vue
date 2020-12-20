@@ -10,7 +10,7 @@
         <img src="../../../assets/1.jpg" alt="">
         <span >管理员</span>
       </div>
-      <div class="pull_right kaiguan">
+      <div class="pull_right kaiguan" @click="exit">
         <svg-icon  iconName="kaigun" />
       </div>
       
@@ -26,9 +26,18 @@ export default {
     const toggleMenu=(()=>{
          root.$store.commit("app/SET_COLLAPSE")
     })
+    const exit=(()=>{
+       root.$store.dispatch("app/exit").then((res)=>{
+          //跳转页面
+          root.$router.push({
+            name:"Login"
+          })
+       })
+    })
 
     return{
-       toggleMenu
+       toggleMenu,
+       exit
     }
       
   }

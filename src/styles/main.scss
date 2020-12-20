@@ -13,6 +13,7 @@
 // 常见的样式
 .pull_right{float:right}
 .pull_left{float:left}
+.space-20{margin-top: 20px;}
 
 //定义动画函数
 @mixin webkit($type,$value){
@@ -22,10 +23,18 @@
     -ms-#{$type}:$value;//Ie
 }
 
-
-
-// body{
-//     background-color:$bj-color
-// }
+//定义label和表单元素之间的定义
+@mixin labelDom($line-height,$align,$width,$font-size){
+    label{
+        float: left;
+        line-height: $line-height + px;
+        text-align: $align;
+        width: $width + px;
+        font-size:$font-size + px;
+    }
+    .warp_content{
+        margin-left:$width + px;
+    }
+}
 
 

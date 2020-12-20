@@ -5,10 +5,11 @@
 </template>
 
 <script>
+import {onMounted, reactive,ref,handleEdit,handleDelete} from "@vue/composition-api";
 export default {
   name: "Home",
   setup(prop,{refs}){
-
+   
     return{
        
     }

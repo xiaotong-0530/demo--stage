@@ -1,12 +1,12 @@
 <template>
-  <div class="cate">
-    <P>我是info  cate</P>
+  <div >
+    <P>我是用户   index</P>
   </div>
 </template>
 
 <script>
 export default {
-  name: "infoCate",
+  name: "infoIndex",
   setup(prop,{refs}){
 
     return{

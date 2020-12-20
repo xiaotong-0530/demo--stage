@@ -12,7 +12,7 @@ Vue.component("svg-icon",Svgicon)
 */
 //1.读取svg文件 转化成webpack能访问的资源(对象) 
 const req = require.context('./svg', false, /\.svg$/) //交给webpack处理
-console.log(req.keys())//打印所有是图标icon
+// console.log(req.keys())//打印所有是图标icon
 const requireAll = requireContext => {
   return requireContext.keys().map(requireContext)
 }
