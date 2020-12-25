@@ -1,7 +1,7 @@
 import {ref} from "@vue/composition-api";
 import { MessageBox } from 'element-ui';
 
-export default global=()=> {
+export const global=()=> {
 
     const comfirm=({content,tip,type,center,callback,id})=>{
         MessageBox.confirm(content, tip, {

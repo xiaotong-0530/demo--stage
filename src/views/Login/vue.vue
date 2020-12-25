@@ -353,7 +353,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .login{
-  height:800px;
+  height:1000px;
   // background-color :#344a5f;
   background-color :rgb(50, 115, 158);
   display: flex;

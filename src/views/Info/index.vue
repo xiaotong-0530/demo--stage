@@ -6,12 +6,10 @@
 
         <el-col :span="4">
           <div class="label_warp category" style="width:100%">
-            <label for="category">类型：</label>
+            <label for="category">分类：</label>
             <div class="warp_content">
               <el-select id="category"  v-model="info_select" slot="prepend" placeholder="请选择" class="info_select">
-                <el-option label="社会型" value="1"></el-option>
-                <el-option label="企业型" value="2"></el-option>
-                <el-option label="常规型" value="3"></el-option>
+                <el-option v-for="cate in category.item" :key="cate.id" :label="cate.category_name" :value="cate.id"></el-option>
               </el-select>
             </div>
           </div>
@@ -21,7 +19,14 @@
           <div class="label_warp date" >
               <label for="date">日期：</label>
               <div class="warp_content">
-                <el-date-picker id="date" style="width:100%" v-model="info_date" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"> </el-date-picker>
+                <el-date-picker
+                    style="width:'100%'"
+                    v-model="info_date"
+                    type="datetimerange"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    :default-time="['12:00:00']">
+                </el-date-picker>
               </div>
           </div>
         </el-col>
@@ -30,7 +35,7 @@
           <div class="label_warp keyword" >
             <label for="keyword">关键字：</label>
             <div class="warp_content">
-              <el-select @click="search_keyword" id="keyword"  v-model="info_keyword" slot="prepend" placeholder="ID" class="info_select" style="width:100%">
+              <el-select @change="search_keyword" id="keyword"  v-model="info_keyword" slot="prepend" placeholder="ID" class="info_select" style="width:100%">
                 <el-option  v-for="item in info_value" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </div>
@@ -42,10 +47,11 @@
         </el-col>
 
         <el-col :span="2">
-            <el-button type="danger"  style="width:100%">搜索</el-button>
+            <el-button type="danger" @click="getNews" style="width:100%">搜索</el-button>
         </el-col>
 
         <el-col :span="4">
+          <!-- <el-button type="danger" @click="kunran" style="width:50%" >重置</el-button> -->
           <el-button type="danger" @click="info_dailog = true" style="width:50%" class="pull_right">新增</el-button>
         </el-col>
 
@@ -54,16 +60,16 @@
       <!-- 中间 -->
       <div class="space-20"></div>
       <el-row>
-        <el-table :data="table_data" border style="width: 100%" ref="table" @selection-change="selected">
+        <el-table :data="table_data.item" border style="width: 100%" ref="table" @selection-change="selected">
           <el-table-column  type="selection" ></el-table-column>
           <el-table-column prop="title"  label="标题"  min-width="6"> </el-table-column>
-          <el-table-column prop="category" label="类别"  min-width="1"> </el-table-column>
-          <el-table-column prop="date"  label="日期" min-width="2"> </el-table-column>
-          <el-table-column prop="name" label="姓名"  min-width="1"> </el-table-column>
+          <el-table-column prop="categoryId" label="类别" :formatter="_cate" min-width="1"> </el-table-column>
+          <el-table-column prop="createDate" label="日期" :formatter="_date" min-width="2"> </el-table-column>
+          <el-table-column prop="id" label="姓名"  min-width="1"> </el-table-column>
           <el-table-column   label="操作"  min-width="2"> 
             <template slot-scope="scope">
               <el-button   size="mini"  type="danger" @click="deletelast(scope.row.id)">删除</el-button>
-              <el-button size="mini" @click="info_dailog_edit=true"  type="success">编辑</el-button>
+              <el-button size="mini" @click="editItem(scope.row.id)"  type="success">编辑</el-button>
             </template> 
           </el-table-column>
         </el-table>
@@ -73,71 +79,76 @@
       <div class="space-20"></div>
       <el-row>
         <el-button class="pull_left" @click="deleteAll"  >批量删除</el-button>
-        <el-pagination background  layout="prev, pager, next" :total="1000"  class="pull_right"> </el-pagination>
+        <el-pagination
+            class="pull_right"
+            background 
+            :current-page="current_page"
+            @current-change="current_change"
+            :page-sizes="[5,10,15]"
+            @size-change="size_change"
+            layout="sizes,total,prev, pager, next" 
+            :total="total">
+        </el-pagination>
       </el-row>
 
       <!-- 新增弹框 -->
-     <InfoDialog :info_dailog.sync='info_dailog'/>
+     <InfoDialog :info_dailog.sync='info_dailog' :category="category.item" @loadNews="getNews"/>
      <!-- 编辑弹框 -->
-     <EditDialog :info_dailog_edit.sync='info_dailog_edit'/>
+     <EditDialog :info_dailog_edit.sync='info_dailog_edit' :category="category.item" :id="editId" @reload="getNews" />
   </div>
 </template>
 
 <script>
 import {onMounted, reactive,ref,handleEdit,handleDelete,watch} from "@vue/composition-api";
-import InfoDialog from "./dialog/info";
-import EditDialog from "./dialog/edit";
-// import {comfirm}  from "../../utils/delete";
-import global from "../../utils/global_3.0";
+import InfoDialog from "./dialog/info";//新增
+import EditDialog from "./dialog/edit";//编辑
+import {common} from "../../api/common"
+import {global} from "../../utils/global_3.0";//删除封装
+import {get_news,delete_news} from "../../api/info"
+import {formatDate} from "../../utils/function"
+import { Input } from 'element-ui';
 
 export default {
   components:{InfoDialog,EditDialog,global},
 
   setup(prop,{refs,root}){
+    ///////////////////////////// 公共业务 ///////////////////////////////////////
+    const category=reactive({
+      item:[]
+    })
+    
+    const {comfirm}= global()
+    const {category:_category,getCategoryAll}= common()
+    watch(()=>_category.item,(value)=>{
+      category.item=value
+    })
+    ///////////////////////////// methods ////////////////////////////////////////
+
+    onMounted(()=>{
+      //1.vuex 获取     2. 3.0特性公共业务抽离
+      getCategoryAll()
+      //2.获取列表信息
+      getNews()
+    })
+
     ///////////////////////////// ref ////////////////////////////////////////
     //类型的默认数据
     const info_select=ref("")
     //日期的默认数据
     const info_date=ref("")
     //关键字的默认数据
-    const info_keyword=ref("")
+    const info_keyword=ref("id")
     //搜索下拉框的默认数据
     const info_value=reactive([
       {value: 'id', label: 'ID' }, 
-      {value: 'png', label: 'PNG' }
+      {value: 'title', label: '标题' }
     ])
     //input框的默认数据
     const info_input=ref("")
     //表格的默认数据
-    const table_data=reactive( [{
-      id:1,
-      title:'纽约市长白思豪宣布退出总统竞选 特朗普发推回应',
-      date: '2016-05-02',
-      name: '管理员',
-      address: '上海市普陀区金沙江路 1518 弄',
-      category:"国内信息"
-    }, {
-        id:2,
-      title:'习近平在中央政协工作会议暨庆祝中国人民政治协商会议成立70周年大会上发表重要讲话',
-      date: '2016-05-04',
-      name: '新华',
-      address: '上海市普陀区金沙江路 1517 弄',
-        category:"国内信息",
-    }, {
-        id:3,
-      title:'基里巴斯与台当局"断交"系蔡当局上台后断交第7国',
-      date: '2016-05-01',
-      name: '思华',
-      address: '上海市普陀区金沙江路 1519 弄',
-        category:"国内信息"
-    }, {  
-      id:4,
-      title:'不选了! 纽约市长白思豪宣布退出2020美国大选',
-      date: '2016-05-03',
-      name: '小童',
-      address: '上海市普陀区金沙江路 1516 弄',
-      category:"国内信息"
-    }])
+    const table_data=reactive({
+        item:[]
+    })
     //新增弹框
     const info_dailog=ref(false)
     //编辑弹框
@@ -147,18 +158,107 @@ export default {
     //弹框文本框
     const info_textarea=ref("")
     //选中的数据行
-    let selected_date=null
-    
+    let selected_date=reactive([])
+    const editId=ref("")
+    //页码和实际数据的值一样
+    const total=ref(0)
     ///////////////////////////// methods ////////////////////////////////////////
+    const kunran=((data)=>{
+      // table_data.item=[]
+      // info_select=[]
+    })
+    //编辑的单个操作
+    const editItem=((id)=>{
+      info_dailog_edit.value=true
+      editId.value=id
+    })
+    //格式化日期
+    const _date=((row)=>{
+      return formatDate(row.createDate)
+    })
+    //格式化分类
+    const _cate=((row)=>{
+
+      let id=row.categoryId
+      let cate_name=""
+      let map=category.item.filter(cate=>{//过滤
+        if(cate.id==id){
+          cate_name=cate.category_name
+        }
+      })
+
+       return cate_name
+    })
+    const current_page=ref(1)
+    const page=reactive({
+        pageNumber:1, //页码
+        pageSize:10   //页大小
+    })
+    //点击页码
+    const current_change=((currentPage)=>{
+      page.pageNumber=currentPage
+      getNews()
+    })
+    //点击页大小
+    const size_change=((pageSize)=>{
+       page.pageSize=pageSize
+       getNews()
+    })
+    //点击选择搜索的类型
+    const search_keyword=((value)=>{
+      // console.log(1111)
+      info_keyword.value=value
+      // console.log("-->",info_keyword.value)
+      
+    })
+    //
+    const serach=(()=>{
+      let data={
+        pageNumber:page.pageNumber, //页码
+        pageSize:page.pageSize      //页大小
+      }
+      //处理类别
+      if(info_select.value){
+        data.categoryId=info_select.value
+      }
+      //日期
+      if(Array.isArray(info_date.value) && info_date.value.length>0){
+        data.startTime=info_date.value[0]
+        data.endTime=info_date.value[1]
+      }
+      //关键字
+      if(info_input.value){
+        data[info_keyword.value]=info_input.value
+        // data.id=info_keyword.value
+      }
+      return data
+    })
+    //获取列表数据
+    const getNews=(()=>{
+      let data=serach()
+      get_news(data).then((res)=>{
+          table_data.item=res.data.data.data
+          total.value=res.data.data.total
+          // total.value=res.data.data.data.length
+          //重新刷新的目的就是为了请求上一页数据
+          if(res.data.data.data.length==0 && page.pageNumber!==1){
+            window.location.reload()
+          }
+      }) 
+    })
     //vue注入的全局方法  通过vue实例 调用
-    const delete_item=(id)=>{
-      // console.log("我是删除")
-      console.log(id)
+    const delete_item=(ids)=>{
+      
+      delete_news({
+        id:ids
+      }).then(res=>{
+        getNews()
+      })
     }
     //单个删除
     const deletelast=((id)=>{
-      const {comfirm}= global()
-      selected_date=reactive([id])
+      
+      selected_date=reactive([Number(id)])
       comfirm({
         content:"此操作将永久删除该文件, 是否继续?",
         tip:"提示",
@@ -168,7 +268,7 @@ export default {
         id:selected_date
       })
     }) 
-
+    // selection-change	当选择项发生变化时会触发该事件
     const selected=(rows)=>{
         selected_date=reactive([])
         rows.map(item=>{
@@ -177,8 +277,19 @@ export default {
     }
     //批量删除
     const deleteAll=(()=>{
-      console.log(selected_date)
-       const {comfirm}= global()
+        const {comfirm}= global()
+        
+        if(selected_date.length==0){
+          root.$message({
+            type:"error",
+            message:"请选中数据",
+            duration:1000
+          })
+          return false
+        }else{
+          
+        }
+
         comfirm({
         content:"此操作将永久删除该文件, 是否继续?",
         tip:"提示",
@@ -188,12 +299,11 @@ export default {
         id:selected_date
       })
     })
-    const search_keyword=(()=>{
-
-    })
+    
     
     return{
       //ref
+      category,
       info_select,
       info_date,
       info_keyword,
@@ -205,11 +315,21 @@ export default {
       info_select2,
       info_textarea,
       selected_date,
+      total,
+      current_page,
+      editId,
       //methods
       search_keyword,
       deletelast,
       deleteAll,
-      selected
+      selected,
+      _date,
+      _cate,
+      getNews,
+      current_change,
+      size_change,
+      kunran,
+      editItem
     }
       
   }
