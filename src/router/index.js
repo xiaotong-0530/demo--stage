@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-// import Home from "../views/Home.vue";
 
 
 Vue.use(VueRouter);
@@ -8,12 +7,8 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    name: "Home",
     redirect: "/home",
     hidden:true,//隐藏
-    meta:{
-      name:"控制台"
-    },
   },
   {
     path: "/home",
@@ -30,13 +25,13 @@ const routes = [
       {
         path: "/index",
         name: "HomeIndex",
-        meta:{name:"首页"},
+        meta:{name:"首页",keep:true},
         component: () =>import( "../views/Home/index.vue"),
       }
         
     ]
   },
-  //info
+  //info 
   {
     path: "/info",
     name: "Info",
@@ -51,14 +46,21 @@ const routes = [
       {
         path: "/infoIndex",
         name: "infoIndex",
-        meta:{name:"信息列表"},
+        meta:{name:"信息列表",keep:true},
         component: () =>import( "../views/Info/index.vue"),
       },
       {
         path: "/infoCate",
         name: "infoCate",
-        meta:{name:"信息分类"},
+        meta:{name:"信息分类",keep:true},
         component: () =>import( "../views/Info/cate.vue"),
+      },
+      {
+        path: "/infoDetail",
+        name: "infoDetail",
+        meta:{name:"消息详情",keep:true},
+        hidden:true,
+        component: () =>import( "../views/Info/dialog/detail.vue")
       }
         
     ]
@@ -78,13 +80,13 @@ const routes = [
       {
         path: "/userIndex",
         name: "userIndex",
-        meta:{name:"用户列表"},
+        meta:{name:"用户列表",keep:true},
         component: () =>import( "../views/User/index.vue"),
       },
       {
         path: "/userCate",
         name: "userCate",
-        meta:{name:"用户分类"},
+        meta:{name:"用户分类",keep:true},
         component: () =>import( "../views/User/cate.vue"),
       }
         
@@ -94,9 +96,6 @@ const routes = [
     path: "/login",
     name: "Login",
     hidden:true,
-    meta:{               
-      name:"用户管理"
-    },
     component: () =>import( "../views/Login/vue.vue")
   }
  

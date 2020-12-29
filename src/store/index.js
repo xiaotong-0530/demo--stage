@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import app from "./modules/app";
+import params from "./modules/params";
 Vue.use(Vuex);
 
 //Element Ui
@@ -13,6 +14,6 @@ export default new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
-    app
+    app,params
   }
 });

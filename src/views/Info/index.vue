@@ -62,14 +62,15 @@
       <el-row>
         <el-table :data="table_data.item" border style="width: 100%" ref="table" @selection-change="selected">
           <el-table-column  type="selection" ></el-table-column>
-          <el-table-column prop="title"  label="标题"  min-width="6"> </el-table-column>
+          <el-table-column prop="title"  label="标题"  min-width="5"> </el-table-column>
           <el-table-column prop="categoryId" label="类别" :formatter="_cate" min-width="1"> </el-table-column>
           <el-table-column prop="createDate" label="日期" :formatter="_date" min-width="2"> </el-table-column>
           <el-table-column prop="id" label="姓名"  min-width="1"> </el-table-column>
-          <el-table-column   label="操作"  min-width="2"> 
+          <el-table-column   label="操作"  min-width="3"> 
             <template slot-scope="scope">
               <el-button   size="mini"  type="danger" @click="deletelast(scope.row.id)">删除</el-button>
               <el-button size="mini" @click="editItem(scope.row.id)"  type="success">编辑</el-button>
+              <el-button size="mini" @click="detailItem(scope.row)"  type="success">编辑详情</el-button>
             </template> 
           </el-table-column>
         </el-table>
@@ -120,7 +121,7 @@ export default {
     const {comfirm}= global()
     const {category:_category,getCategoryAll}= common()
     watch(()=>_category.item,(value)=>{
-      category.item=value
+      category.item=value 
     })
     ///////////////////////////// methods ////////////////////////////////////////
 
@@ -163,7 +164,34 @@ export default {
     //页码和实际数据的值一样
     const total=ref(0)
     ///////////////////////////// methods ////////////////////////////////////////
-    const kunran=((data)=>{
+    const detailItem=((row)=>{
+      //让对应详情在nav中显示
+      root.$router.options.routes[2].children[2].hidden=false
+      //跳转
+      //需要传递的参数保存到vuex  -->本地
+      const params={
+        id:{
+          value:row.id,
+          key:"id",
+          session:true//保存到session
+        }
+      }
+      
+
+      root.$store.commit("params/CACHE_PARAMS",params)
+
+      root.$router.push({
+          name:"infoDetail",
+          params:{
+            id:row.id,
+          }
+      })
+    })
+   
+   
+   
+   
+   const kunran=((data)=>{
       // table_data.item=[]
       // info_select=[]
     })
@@ -268,7 +296,7 @@ export default {
         id:selected_date
       })
     }) 
-    // selection-change	当选择项发生变化时会触发该事件
+    // selection-change	当选择项发生变化时会触发该事件3
     const selected=(rows)=>{
         selected_date=reactive([])
         rows.map(item=>{
@@ -303,33 +331,11 @@ export default {
     
     return{
       //ref
-      category,
-      info_select,
-      info_date,
-      info_keyword,
-      info_value,
-      info_input,
-      table_data,
-      info_dailog,
-      info_dailog_edit,
-      info_select2,
-      info_textarea,
-      selected_date,
-      total,
-      current_page,
-      editId,
+      category,info_select,info_date,info_keyword,info_value,info_input,table_data,info_dailog,
+      info_dailog_edit,info_select2,info_textarea,selected_date,total,current_page,editId,
       //methods
-      search_keyword,
-      deletelast,
-      deleteAll,
-      selected,
-      _date,
-      _cate,
-      getNews,
-      current_change,
-      size_change,
-      kunran,
-      editItem
+      search_keyword,deletelast,deleteAll,selected, _date,_cate,getNews,current_change,size_change,
+      kunran,editItem,detailItem
     }
       
   }

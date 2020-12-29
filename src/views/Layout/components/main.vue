@@ -1,14 +1,22 @@
 <template>
   <div class="main">
-    <router-view/>
+    <keep-alive>
+      <router-view v-if="$route.meta.keep"/>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keep"/>
   </div>
 </template>
 
 <script>
+import {reactive,ref,watch} from '@vue/composition-api'
 export default {
   name: "Home",
-  setup(prop,{refs}){
-
+  setup(prop,{refs,root}){
+    //root.$router  挂载到vue更组件所有路由对象 push redirect
+    //root.$route   当前激活的路由对象
+    watch(()=>root.$route.path,(value1,value2)=>{
+      console.log(value1,value2)
+    })
     return{
        
     }
