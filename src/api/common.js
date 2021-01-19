@@ -1,5 +1,6 @@
 import {reactive} from "@vue/composition-api";
 import {get_all_category} from "../api/info"
+import axios from "@/utils/request.js"
 
 export const common=()=> {
     //分类信息
@@ -19,4 +20,15 @@ export const common=()=> {
         getCategoryAll
     }
 
+}
+
+
+//表格请求
+export const loadTableDate =(params) =>{
+    return axios.request({
+        method: params.method,
+        url:params.url,
+        data: params.data
+        
+    })
 }

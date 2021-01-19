@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import {computed, reactive ,ref } from "@vue/composition-api";
+import {computed, reactive ,ref, watch } from "@vue/composition-api";
 import Svgicon from "../../../Icons/component/Svgicon.vue"
 
 export default {
@@ -43,11 +43,12 @@ export default {
 
     //读取vuex中的state
     const isCollapse = computed(()=>{
-      // console.log(root.$store.getters["app/isCollapse"])
       return root.$store.getters["app/isCollapse"]
     })
     //获取路由对象
-    // console.log(root.$router)
+    watch(()=>root.$router.options.routes,(value)=>{
+        console.log("-->",222222)
+    })
     const routes=reactive(root.$router.options.routes)
 
     return {

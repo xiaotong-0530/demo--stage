@@ -35,9 +35,7 @@
           <div class="label_warp keyword" >
             <label for="keyword">关键字：</label>
             <div class="warp_content">
-              <el-select @change="search_keyword" id="keyword"  v-model="info_keyword" slot="prepend" placeholder="ID" class="info_select" style="width:100%">
-                <el-option  v-for="item in info_value" :key="item.value" :label="item.label" :value="item.value"></el-option>
-              </el-select>
+              <Selectone :option="data.option" :selectValue.sync="data.selectValue"/>
             </div>
           </div>
         </el-col>
@@ -108,9 +106,10 @@ import {global} from "../../utils/global_3.0";//删除封装
 import {get_news,delete_news} from "../../api/info"
 import {formatDate} from "../../utils/function"
 import { Input } from 'element-ui';
+import Selectone from "../../components/select/index" //下拉
 
 export default {
-  components:{InfoDialog,EditDialog,global},
+  components:{InfoDialog,EditDialog,global,Selectone},
 
   setup(prop,{refs,root}){
     ///////////////////////////// 公共业务 ///////////////////////////////////////
@@ -133,6 +132,13 @@ export default {
     })
 
     ///////////////////////////// ref ////////////////////////////////////////
+    //初始化下拉框的选项
+    const data=reactive({
+      option:{init:["id","title"]},//init初始化的内容
+      //选中的select
+      selectValue:{},
+    })
+      
     //类型的默认数据
     const info_select=ref("")
     //日期的默认数据
@@ -332,7 +338,7 @@ export default {
     return{
       //ref
       category,info_select,info_date,info_keyword,info_value,info_input,table_data,info_dailog,
-      info_dailog_edit,info_select2,info_textarea,selected_date,total,current_page,editId,
+      info_dailog_edit,info_select2,info_textarea,selected_date,total,current_page,editId,data,
       //methods
       search_keyword,deletelast,deleteAll,selected, _date,_cate,getNews,current_change,size_change,
       kunran,editItem,detailItem

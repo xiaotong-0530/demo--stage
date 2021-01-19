@@ -98,3 +98,15 @@ export const edit_news=(data)=>{
         data: data
     })
 }
+
+
+/*
+  省  市
+*/
+export const yingxian=(data)=>{
+    return axios.request({
+        method: 'post',
+        url: '/news/cityPicker/',
+        data: data
+    })
+}

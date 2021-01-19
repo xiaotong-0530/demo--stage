@@ -1,4 +1,3 @@
-import {ref} from "@vue/composition-api";
 import { MessageBox } from 'element-ui';
 
 export const global=()=> {

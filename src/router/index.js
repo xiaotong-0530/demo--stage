@@ -4,107 +4,116 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
-const routes = [
-  {
-    path: "/",
-    redirect: "/home",
-    hidden:true,//隐藏
-  },
-  {
-    path: "/home",
-    name: "Home",
-    hidden:false,
-    //自定义属性
-    meta:{
-      name:"控制台",
-      icon:"工业组件-仪表盘"
+export const defaultRoutes = [
+    //都能访问公共路由
+    {
+      path: "/",
+      redirect: "/home",
+      hidden:true,//隐藏
+    }, 
+    {
+      path: "/login",
+      name: "Login",
+      hidden:true,
+      component: () =>import( "../views/Login/vue.vue")
     },
-    component: () =>import( "../views/Layout/index.vue"),
-    redirect:"/index",
-    children:[
-      {
-        path: "/index",
-        name: "HomeIndex",
-        meta:{name:"首页",keep:true},
-        component: () =>import( "../views/Home/index.vue"),
-      }
-        
-    ]
-  },
-  //info 
-  {
-    path: "/info",
-    name: "Info",
-    hidden:false,
-    //自定义属性
-    meta:{
-      name:"信息管理",
-      icon:"信息"
+
+    //权限选择的路由
+    {
+      path: "/home",
+      name: "Home",
+      hidden:false,
+      //自定义属性
+      meta:{
+        name:"控制台",
+        icon:"工业组件-仪表盘"
+      },
+      component: () =>import( "../views/Layout/index.vue"),
+      redirect:"/index",
+      children:[
+        {
+          path: "/index",
+          name: "HomeIndex",
+          meta:{name:"首页",keep:true},
+          component: () =>import( "../views/Home/index.vue"),
+        }
+          
+      ]
     },
-    component: () =>import( "../views/Layout/index.vue"),
-    children:[
-      {
-        path: "/infoIndex",
-        name: "infoIndex",
-        meta:{name:"信息列表",keep:true},
-        component: () =>import( "../views/Info/index.vue"),
+];  
+export const roleRouter=[
+  
+    //info 
+    {
+      path: "/info",
+      name: "Info",
+      hidden:false,
+      //自定义属性
+      meta:{
+        name:"信息管理",
+        icon:"信息",
+        role:['salesman']
       },
-      {
-        path: "/infoCate",
-        name: "infoCate",
-        meta:{name:"信息分类",keep:true},
-        component: () =>import( "../views/Info/cate.vue"),
-      },
-      {
-        path: "/infoDetail",
-        name: "infoDetail",
-        meta:{name:"消息详情",keep:true},
-        hidden:true,
-        component: () =>import( "../views/Info/dialog/detail.vue")
-      }
-        
-    ]
-  },
-  //User 用户
-  {
-    path: "/user",
-    name: "User",
-    hidden:false,
-    //自定义属性
-    meta:{
-      name:"用户管理",
-      icon:"user"
+      component: () =>import( "../views/Layout/index.vue"),
+      children:[
+        {
+          path: "/infoIndex",
+          name: "infoIndex",
+          meta:{name:"信息列表",keep:true,role:["info.index"]},
+          component: () =>import( "../views/Info/index.vue"),
+        },
+        {
+          path: "/infoCate",
+          name: "infoCate",
+          meta:{name:"信息分类",keep:true,role:["info.cate"]},
+          component: () =>import( "../views/Info/cate.vue"),
+        },
+        {
+          path: "/infoDetail",
+          name: "infoDetail",
+          meta:{name:"消息详情",keep:true,role:["info.delete"]},
+          hidden:true,
+          component: () =>import( "../views/Info/dialog/detail.vue")
+        }
+      ]
     },
-    component: () =>import( "../views/Layout/index.vue"),
-    children:[
-      {
-        path: "/userIndex",
-        name: "userIndex",
-        meta:{name:"用户列表",keep:true},
-        component: () =>import( "../views/User/index.vue"),
+    //User 用户
+    {
+      path: "/user",
+      name: "User",
+      hidden:false,
+      //自定义属性
+      meta:{
+        name:"用户管理",
+        icon:"user",
+        role:["salesman"]
       },
-      {
-        path: "/userCate",
-        name: "userCate",
-        meta:{name:"用户分类",keep:true},
-        component: () =>import( "../views/User/cate.vue"),
-      }
-        
-    ]
-  },
-  {
-    path: "/login",
-    name: "Login",
-    hidden:true,
-    component: () =>import( "../views/Login/vue.vue")
-  }
+      component: () =>import( "../views/Layout/index.vue"),
+      children:[
+        {
+          path: "/userIndex",
+          name: "userIndex",
+          meta:{name:"用户列表",keep:true,role:["user.index"]},
+          component: () =>import( "../views/User/index.vue"),
+        },
+        {
+          path: "/userCate",
+          name: "userCate",
+          meta:{name:"用户分类",keep:true,role:["user.cate"]},
+          component: () =>import( "../views/User/cate.vue"),
+        }
+          
+      ]
+    },
+]
+
  
-];
+
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes
+  routes:defaultRoutes
 });
 
 

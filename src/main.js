@@ -2,7 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 //导入路由权限
-// import "./router/permit"
+import "./router/permit"
 import store from "./store";
 // icon图标
 import "./Icons/index"
